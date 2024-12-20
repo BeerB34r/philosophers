@@ -6,7 +6,7 @@
 /*   By: mde-beer <mde-beer@student.codam.nl>          +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2024/12/19 14:56:41 by mde-beer       #+#    #+#                */
-/*   Updated: 2024/12/19 18:29:39 by mde-beer       ########   odam.nl        */
+/*   Updated: 2024/12/20 16:28:25 by mde-beer       ########   odam.nl        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ t_fellow **guests
 	while (++i < guestlist)
 	{
 		existentialists[i].id = i;
+		existentialists[i].state = undefined;
+		existentialists[i].attention = PTHREAD_MUTEX_INITIALIZER;
 		christen(&existentialists[i], clock());
 	}
 	return (0);

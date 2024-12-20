@@ -6,7 +6,7 @@
 /*   By: mde-beer <mde-beer@student.codam.nl>          +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2024/12/04 15:21:06 by mde-beer       #+#    #+#                */
-/*   Updated: 2024/12/19 18:10:40 by mde-beer       ########   odam.nl        */
+/*   Updated: 2024/12/20 16:45:07 by mde-beer       ########   odam.nl        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,17 @@ typedef pthread_mutex_t						t_lock;
 typedef struct s_philosopher				t_fellow;
 typedef struct s_party						t_party;
 typedef struct s_peripheral_vision_loss		t_periphery;
+typedef enum e_state						t_state;
 
+//		Enums
+enum e_state
+{
+	undefined,
+	thinking,
+	eating,
+	sleeping,
+	dead
+}
 //		Structs
 struct s_philosopher
 {
@@ -40,6 +50,8 @@ struct s_philosopher
 	const char	*nationality;
 	const char	*firstname;
 	const char	*lastname;
+	t_state		state;
+	t_lock		attention;
 	t_imestamp	last_meal;
 };
 

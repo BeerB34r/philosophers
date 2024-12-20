@@ -6,7 +6,7 @@
 /*   By: mde-beer <mde-beer@student.codam.nl>          +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2024/12/05 18:32:25 by mde-beer       #+#    #+#                */
-/*   Updated: 2024/12/10 14:54:36 by mde-beer       ########   odam.nl        */
+/*   Updated: 2024/12/20 17:16:08 by mde-beer       ########   odam.nl        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,4 +37,27 @@ t_imestamp	seed
 	fellow->lastname = lastname[index % 12];
 	index = seed.tv_sec * seed.tv_usec + fellow_id;
 	fellow->nationality = nationality[index % 7];
+}
+
+static void
+	bondage(void)
+{
+	pthread_mutex_lock(gate());
+	pthread_mutex_unlock(gate());
+}
+
+void
+	*routine(
+void *arg
+)
+{
+	t_periphery *const	periphery = arg;
+
+	bondage();
+	while (periphery->myself.state != dead)
+	{
+
+	}
+	pthread_mutex_destroy(&periphery->myself.attention);
+	return (NULL);
 }

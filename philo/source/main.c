@@ -6,7 +6,7 @@
 /*   By: mde-beer <mde-beer@student.codam.nl>          +#+                    */
 /*                                                    +#+                     */
 /*   Created: 2024/12/19 17:39:11 by mde-beer       #+#    #+#                */
-/*   Updated: 2024/12/19 18:47:23 by mde-beer       ########   odam.nl        */
+/*   Updated: 2024/12/20 15:29:22 by mde-beer       ########   odam.nl        */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,27 +21,6 @@ const char *error
 	printf("%s\n", error);
 	printf("Usage: %s %s\n", bin_name, USAGE);
 	return (1);
-}
-
-void
-	finish(void)
-{
-	t_lock *const	gate = gate();
-	t_party *const	party = butler(NULL);
-
-	clear_out()
-}
-
-int	
-	go(void)
-{
-	const t_lock	*gate = gate();
-	const t_party	*party = butler(NULL);
-
-	pthread_mutex_lock(gate);
-	untie(party->guests, party->utensils);
-	monitor(party);
-	pthread_mutex_unlock(gate);
 }
 
 int	
@@ -96,7 +75,5 @@ char **argv
 		return (1);
 	if (set(argc, argv))
 		return (1);
-	if (go())
-		return (1);
-	finish();
+	return (go());
 }
