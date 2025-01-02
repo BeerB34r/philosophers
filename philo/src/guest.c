@@ -115,10 +115,17 @@ void *arg
 )
 {
 	t_philo *const	self = (t_philo *)arg;
+	bool			error;
 
 	pthread_mutex_lock(gate());
 	self->last_meal = get_time();
+	if (self->state == dead)
+		error = true;
+	else
+		error = false;
 	pthread_mutex_unlock(gate());
+	if (error)
+		return (NULL);
 	while (self->chart.done == 0 || self->count < self->chart.done)
 	{
 		if (die_or_print(self, "is thinking"))

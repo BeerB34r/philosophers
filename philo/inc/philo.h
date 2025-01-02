@@ -112,5 +112,10 @@ int
 	usage(
 		const char *bin,
 		const char *err
-		);	// FILE: init.c
+		);	// FILE: error.c
+int
+	error(
+		const char *message,
+		const int code
+		);	// FILE: error.c
 #endif

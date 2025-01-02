@@ -18,7 +18,7 @@
 // at which point it will flip back up toward config.count.
 // yes, i know.
 
-// TODO do some proper error handling in the case of threads failing
+// TODO: do some proper error handling in the case of threads failing
 int
 	main(
 int argc,
@@ -31,21 +31,17 @@ char **argv
 	unsigned int	i;
 
 	if (argc < 5 || 6 < argc)
-		return (usage(argv[0], "INVALID_PARAMETER_COUNT"));
+		return (usage(argv[0], "INVALID_PARAMETER_COUNT\n"));
 	if (set_config(argc, argv, &config))
-		return (printf("ERR: INVALID_PARAMETER(S)"));
+		return (error("INVALID_PARAMETER(S)\n", 1));
 	if (invite_guests(config, fork, philo))
-		return (printf("ERR: MUTEX_INIT\n"));
-	pthread_mutex_lock(gate());
+		return (error("MUTEX_INIT\n", 2));
+	if (seat_guests(config, philo))
+		return (error("THREAD_CREATION\n", 3));
 	i = -1;
 	while (++i < config.count)
-		if (pthread_create(&philo[i].thread, NULL, routine, &philo[i]))
-			return (printf("ERR: THREAD_CREATION\n"));
-	pthread_mutex_unlock(gate());
+		pthread_join(philo[i].thread, NULL);
 	while (i--)
-		if (pthread_join(philo[i].thread, NULL))
-			return (printf("ERR: THREAD_EXIT\n"));
-	while (++i < config.count)
 	{
 		pthread_mutex_destroy(&fork[i]);
 		pthread_mutex_destroy(&philo[i].self);

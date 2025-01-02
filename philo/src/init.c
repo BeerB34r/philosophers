@@ -16,17 +16,6 @@
 #include <limits.h>
 #include <stdint.h>
 
-int
-	usage(
-const char *bin,
-const char *err
-)
-{
-	printf("ERR: %s\n", err);
-	printf("USAGE: %s %s\n", bin, USAGE);
-	return (1);
-}
-
 static int
 	ph_inlimset(
 int c,
@@ -81,8 +70,10 @@ t_config *config
 
 	if (argc == 6)
 		done = ph_atoi(argv[5]);
+	else
+		done = 0;
 	if (count == ULONG_MAX || die == ULONG_MAX || eat == ULONG_MAX
-		|| eep == ULONG_MAX || done == ULONG_MAX)
+		|| eep == ULONG_MAX || done == ULONG_MAX || count == 0)
 		return (true);
 	*config = (t_config){.count = count,
 		.die = die,
@@ -120,6 +111,40 @@ t_philo philo[MAX_PHILO]
 		philo[i].last_meal = SIZE_MAX;
 		philo[i].count = 0;
 		philo[i].chart = config;
+		philo[i].state = thinking;
 	}
+	return (false);
+}
+
+bool
+	seat_guests(
+t_config config,
+t_philo philo[MAX_PHILO]
+)
+{
+	int	i;
+	int	j;
+
+	i = -1;
+	pthread_mutex_lock(gate());
+	while (++i < config.count)
+	{
+		if (pthread_create(&philo[i].thread, NULL, routine, &philo[i]))
+		{
+			j = i;
+			while (j)
+				philo[--j].state = dead;
+			pthread_mutex_unlock(gate());
+			while (i)
+				pthread_join(philo[--i].thread, NULL);
+			while (i < config.count)
+			{
+				pthread_mutex_destroy(&philo[i].left);
+				pthread_mutex_destroy(&philo[i++]);
+			}
+			return (true);
+		}
+	}
+	pthread_mutex_unlock(gate());
 	return (false);
 }
