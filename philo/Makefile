@@ -12,7 +12,7 @@
 
 .PHONY			:	all re clean fclean run
 
-SRCFILES		=	init.c guest.c stately_affairs.c main.c
+SRCFILES		=	error.c init.c main.c philo.c stately_affairs.c verb.c
 SRCDIR			=	src
 
 OBJFILES		=	$(SRCFILES:%.c=$(OBJDIR)/%.o)
@@ -35,13 +35,13 @@ $(OBJDIR)		: ;	mkdir $(OBJDIR)
 clean			: ;	rm -rf $(OBJDIR)
 fclean			:	clean ;	rm -f $(NAME)
 re				:	fclean $(NAME)
-run				:	$(NAME) ;	./$(NAME)
+run				:	$(NAME) ;	./$(NAME) $(PARAMS)
 
 $(NAME)			:	$(OBJFILES)
 			$(CC) $(CFLAGS) $(INCLUDE) -o $@ $^
 
 $(OBJDIR)/%.o	:	%.c $(HEADERS) | $(OBJDIR)
-			$(CC) $(CFLAGS) $(INCLUDE) -c -o $@ $^
+			$(CC) $(CFLAGS) $(INCLUDE) -c -o $@ $<
 
 # Canceling implicit rules
 #%.o				:	%.c

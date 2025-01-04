@@ -73,16 +73,13 @@ t_config *config
 	else
 		done = 0;
 	if (count == ULONG_MAX || die == ULONG_MAX || eat == ULONG_MAX
-		|| eep == ULONG_MAX || done == ULONG_MAX || count == 0
-		|| count > MAX_PHILO)
+		|| eep == ULONG_MAX || done == ULONG_MAX || count == 0)
 		return (true);
 	*config = (t_config){.count = count,
 		.die = die,
 		.eat = eat,
 		.eep = eep,
-		.done = done,
-		.full = malloc(sizeof(unsigned _Atomic int) * 1),
-		.dead = malloc(sizeof(_Atomic bool) * 1)};
+		.done = done};
 	return (false);
 }
 
@@ -93,7 +90,7 @@ t_lock fork[MAX_PHILO],
 t_philo philo[MAX_PHILO]
 )
 {
-	unsigned int				i;
+	unsigned int	i;
 
 	i = -1;
 	while (++i < config.count)
@@ -101,8 +98,11 @@ t_philo philo[MAX_PHILO]
 		if (pthread_mutex_init(&fork[i], NULL) || \
 			pthread_mutex_init(&philo[i].self, NULL))
 		{
-			philo[i].left = &fork[i];
-			mutex_clean(i, philo);
+			while (i >= 0)
+			{
+				pthread_mutex_destroy(&fork[i]);
+				pthread_mutex_destroy(&philo[i--].self);
+			}
 			return (true);
 		}
 		philo[i].pid = i + 1;
@@ -112,7 +112,6 @@ t_philo philo[MAX_PHILO]
 		philo[i].count = 0;
 		philo[i].chart = config;
 		philo[i].state = thinking;
-		philo[i].start = SIZE_MAX;
 	}
 	return (false);
 }
@@ -120,11 +119,11 @@ t_philo philo[MAX_PHILO]
 bool
 	seat_guests(
 t_config config,
-t_philo philo[MAX_PHILO],
-pthread_t *monitor
+t_philo philo[MAX_PHILO]
 )
 {
-	unsigned int				i;
+	int	i;
+	int	j;
 
 	i = -1;
 	pthread_mutex_lock(gate());
@@ -132,16 +131,19 @@ pthread_t *monitor
 	{
 		if (pthread_create(&philo[i].thread, NULL, philosopher, &philo[i]))
 		{
-			premature_death(i, config, philo);
-			mutex_clean(config.count, philo);
+			j = i;
+			while (j)
+				philo[--j].state = dead;
+			pthread_mutex_unlock(gate());
+			while (i)
+				pthread_join(philo[--i].thread, NULL);
+			while (i < config.count)
+			{
+				pthread_mutex_destroy(&philo[i].left);
+				pthread_mutex_destroy(&philo[i++]);
+			}
 			return (true);
 		}
-	}
-	if (pthread_create(monitor, NULL, monitoring, philo))
-	{
-		premature_death(i, config, philo);
-		mutex_clean(config.count, philo);
-		return (true);
 	}
 	pthread_mutex_unlock(gate());
 	return (false);

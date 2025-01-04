@@ -13,8 +13,6 @@
 #include <philo.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <stdint.h>
-#include <stdio.h>
 
 t_lock
 	*gate(void)
@@ -41,17 +39,28 @@ size_t
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
+size_t
+	start_time(void)
+{
+	static size_t	start;
+
+	if (!start)
+		start = get_time();
+	return (start);
+}
+
 int	
 	reaper(
 t_philo *const philo,
 size_t sand
 )
 {
-	if (sand != SIZE_MAX)
-		sand += get_time();
+	sand += get_time();
 	while (sand > get_time())
 	{
-		if (*(philo->chart.dead) || famine(philo))
+		if (philo->chart->dead)
+			return (1);
+		if (famine(philo))
 			return (1);
 		usleep(INTERVAL);
 	}
@@ -59,20 +68,23 @@ size_t sand
 }
 
 int
+	stop_check(
+t_philo *const philo
+)
+{
+	return (philo->chart->dead || philo->chart->full == philo->chart.count)
+}
+
+int
 	famine(
 t_philo *const philo
 )
 {
-	if (get_time() - philo->last_meal <= philo->chart.die)
+	if (get_time() - philo->last_meal < philo->chart.die)
 		return (0);
 	pthread_mutex_lock(print());
-	if (*(philo->chart.dead))
-	{
-		pthread_mutex_unlock(print());
-		return (1);
-	}
-	*(philo->chart.dead) = true;
-	printf(MSG_BASE, get_time() - philo->start, philo->pid, MSG_DEAD);
+	philo->chart->dead = true;
+	printf(MSG_BASE, get_time() - start_time(), philo->pid, MSG_DEAD);
 	pthread_mutex_unlock(print());
 	return (1);
 }

@@ -49,7 +49,7 @@ struct s_program_configuration
 	unsigned int			eep;
 	unsigned int			done;
 	unsigned _Atomic int	*full;
-	_Atomic bool			*dead;
+	unsigned _Atomic bool	*dead;
 };
 
 struct s_philo
@@ -61,105 +61,70 @@ struct s_philo
 	t_lock			*left;
 	t_lock			*right;
 	enum e_state	state;
-	size_t			start;
 	size_t			last_meal;
 	unsigned int	count;
 };
 
-t_lock
+t_lock	
 	*gate(void);	// FILE: stately_affairs.c
-t_lock
-	*print(void);	// FILE: stately_affairs.c
-size_t
+size_t	
 	get_time(void);	// FILE: stately_affairs.c
-int	
+void	
 	reaper(
-		t_philo *const philo,
+		t_philo *const self,
 		size_t sand
 		);	// FILE: stately_affairs.c
-int	
-	famine(
-		t_philo *const philo
+void	
+	set_eat(
+		t_philo *const self
 		);	// FILE: stately_affairs.c
-bool
-	set_config(
-		int argc,
-		char **argv,
-		t_config *config
-		);	// FILE: init.c
-bool
+void	
+	set_sleep(
+		t_philo *const self
+		);	// FILE: stately_affairs.c
+void	
+	atomic_print_state(
+		const char *str,
+		t_philo *philo
+		);	// FILE: guest.c
+bool	
+	die_or_print(
+		t_philo *const self,
+		const char *print
+		);	// FILE: guest.c
+void	
+	grab_fork(
+		t_philo *const self,
+		bool odd
+		);	// FILE: guest.c
+void	
+	eat(
+		t_philo *const self
+		);	// FILE: guest.c
+void	
+	*routine(
+		void *arg
+		);	// FILE: guest.c
+bool	
 	invite_guests(
 		t_config config,
 		t_lock fork[MAX_PHILO],
 		t_philo philo[MAX_PHILO]
 		);	// FILE: init.c
-bool
-	seat_guests(
-		t_config config,
-		t_philo philo[MAX_PHILO],
-		pthread_t *monitor
+bool	
+	set_config(
+		int argc,
+		char **argv,
+		t_config *config
 		);	// FILE: init.c
-void
-	*philosopher(
-		void *arg
-		);	// FILE: philo.c
-void
-	*monitoring(
-		void *arg
-		);	// FILE: philo.c
-void
-	check_health(
-		t_philo *const philo,
-		t_config config
-		);	// FILE: philo.c
-int	
-	stop(
-		t_config config
-		);	// FILE philo.c
-int	
-	state_change(
-		t_philo *const philo,
-		enum e_state state
-		);	// FILE: philo.c
-int	
-	think(
-		t_philo *const philo
-		);	// FILE: verb.c
-int	
-	eat(
-		t_philo *const philo
-		);	// FILE: verb.c
-int	
-	grab(
-		t_philo *const philo
-		);	// FILE: verb.c
-int	
-	grab_first(
-		t_philo *const philo
-		);	// FILE: verb.c
-int	
-	grab_second(
-		t_philo *const philo
-		);	// FILE: verb.c
-int	
-	error(
-		const char *message,
-		const int code
-		);	// FILE: error.c
-int	
+int		
 	usage(
 		const char *bin,
 		const char *err
 		);	// FILE: error.c
-void
-	mutex_clean(
-		int count,
-		t_philo philo[MAX_PHILO]
-		);	// FILE: error.c
-void
-	premature_death(
-		int count,
-		t_config config,
-		t_philo philo[MAX_PHILO]
+int
+	error(
+		const char *message,
+		const int code
 		);	// FILE: error.c
 #endif
