@@ -22,9 +22,10 @@ HEADERS			=	philo.h
 INCLDIR			=	inc
 INCLUDE			=	$(addprefix -I, $(INCLDIR))
 
+VPATH			=	$(SRCDIR) $(OBJDIR) $(INCLDIR)
 CC				=	cc
 CFLAGS			=	-Wall -Wextra -Werror
-VPATH			=	$(SRCDIR) $(OBJDIR) $(INCLDIR)
+
 MAKEFLAGS		+=	-j$(shell nproc) --output-sync=target --no-print-directory
 .DEFAULT_GOAL	=	all
 
