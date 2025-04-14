@@ -63,16 +63,19 @@ int
 t_philo *const philo
 )
 {
+	pthread_mutex_lock(&philo->self);
 	if (get_time() - philo->last_meal <= philo->chart.die)
-		return (0);
+		return (pthread_mutex_unlock(&philo->self), 0);
 	pthread_mutex_lock(print());
 	if (*(philo->chart.dead))
 	{
 		pthread_mutex_unlock(print());
+		pthread_mutex_unlock(&philo->self);
 		return (1);
 	}
 	*(philo->chart.dead) = true;
 	printf(MSG_BASE, get_time() - philo->start, philo->pid, MSG_DEAD);
 	pthread_mutex_unlock(print());
+	pthread_mutex_unlock(&philo->self);
 	return (1);
 }

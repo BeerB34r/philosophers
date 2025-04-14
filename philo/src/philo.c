@@ -51,7 +51,9 @@ void *arg
 	while (!stop(config))
 	{
 		i = (i + 1) % config.count;
+		pthread_mutex_lock(&philo[i].self);
 		check_health(&philo[i], config);
+		pthread_mutex_unlock(&philo[i].self);
 	}
 	return (NULL);
 }

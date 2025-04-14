@@ -24,7 +24,7 @@ INCLUDE			=	$(addprefix -I, $(INCLDIR))
 
 VPATH			=	$(SRCDIR) $(OBJDIR) $(INCLDIR)
 CC				=	cc
-CFLAGS			=	-Wall -Wextra -Werror
+CFLAGS			=	-Wall -Wextra -Werror -g -fsanitize=thread -
 
 MAKEFLAGS		+=	-j$(shell nproc) --output-sync=target --no-print-directory
 .DEFAULT_GOAL	=	all
@@ -32,10 +32,12 @@ MAKEFLAGS		+=	-j$(shell nproc) --output-sync=target --no-print-directory
 NAME			=	philo
 
 all				:	$(NAME)
-$(OBJDIR)		: ;	mkdir $(OBJDIR)
+$(OBJDIR)		: ;	mkdir -p $(OBJDIR)
 clean			: ;	rm -rf $(OBJDIR)
 fclean			:	clean ;	rm -f $(NAME)
-re				:	fclean $(NAME)
+re				:
+	+$(MAKE) fclean
+	+$(MAKE) $(NAME)
 run				:	$(NAME) ;	./$(NAME) $(PARAMS)
 
 $(NAME)			:	$(OBJFILES)

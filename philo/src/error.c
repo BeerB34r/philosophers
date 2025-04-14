@@ -74,5 +74,5 @@ t_philo philo[MAX_PHILO]
 	*(config.dead) = true;
 	pthread_mutex_unlock(gate());
 	while (count >= 0)
-		pthread_join(philo[count].thread, NULL);
+		pthread_join(philo[count--].thread, NULL);
 }
