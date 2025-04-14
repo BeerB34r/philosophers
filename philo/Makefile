@@ -24,7 +24,7 @@ INCLUDE			=	$(addprefix -I, $(INCLDIR))
 
 VPATH			=	$(SRCDIR) $(OBJDIR) $(INCLDIR)
 CC				=	cc
-CFLAGS			=	-Wall -Wextra -Werror -g -fsanitize=thread -
+CFLAGS			=	-Wall -Wextra -Werror -O3
 
 MAKEFLAGS		+=	-j$(shell nproc) --output-sync=target --no-print-directory
 .DEFAULT_GOAL	=	all

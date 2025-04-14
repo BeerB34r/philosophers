@@ -23,10 +23,12 @@ void *arg
 	static size_t	start_time;
 
 	pthread_mutex_lock(gate());
+	pthread_mutex_lock(&self->self);
 	if (!start_time)
 		start_time = get_time();
 	self->start = start_time;
 	self->last_meal = self->start;
+	pthread_mutex_unlock(&self->self);
 	pthread_mutex_unlock(gate());
 	while (!stop(self->chart))
 		if (think(self) || grab(self) || eat(self))
@@ -104,15 +106,15 @@ enum e_state state
 		msg = MSG_EAT;
 	else if (state == sleeping)
 		msg = MSG_SLEEP;
-	pthread_mutex_lock(print());
 	pthread_mutex_lock(&philo->self);
+	pthread_mutex_lock(print());
 	ret = stop(philo->chart);
 	if (!ret)
 		printf(MSG_BASE, get_time() - philo->start, philo->pid, msg);
 	philo->state = state;
 	if (state == eating)
 		philo->last_meal = get_time();
-	pthread_mutex_unlock(&philo->self);
 	pthread_mutex_unlock(print());
+	pthread_mutex_unlock(&philo->self);
 	return (ret);
 }
