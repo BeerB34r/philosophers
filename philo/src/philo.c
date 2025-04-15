@@ -13,6 +13,7 @@
 #include <philo.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <unistd.h>
 
 void
 	*philosopher(
@@ -22,14 +23,14 @@ void *arg
 	t_philo *const	self = (t_philo *)arg;
 	static size_t	start_time;
 
-	pthread_mutex_lock(gate());
+	gate(true);
 	pthread_mutex_lock(&self->self);
 	if (!start_time)
 		start_time = get_time();
 	self->start = start_time;
 	self->last_meal = self->start;
 	pthread_mutex_unlock(&self->self);
-	pthread_mutex_unlock(gate());
+	gate(false);
 	while (!stop(self->chart))
 		if (think(self) || grab(self) || eat(self))
 			break ;
@@ -48,14 +49,15 @@ void *arg
 	philo = (t_philo *)arg;
 	config = philo[0].chart;
 	i = -1;
-	pthread_mutex_lock(gate());
-	pthread_mutex_unlock(gate());
+	gate(true);
+	gate(false);
 	while (!stop(config))
 	{
 		i = (i + 1) % config.count;
 		pthread_mutex_lock(&philo[i].self);
 		check_health(&philo[i], config);
 		pthread_mutex_unlock(&philo[i].self);
+		usleep(INTERVAL * 2);
 	}
 	return (NULL);
 }
@@ -70,15 +72,15 @@ t_config config
 		return ;
 	if (get_time() - philo->last_meal <= config.die)
 		return ;
-	pthread_mutex_lock(print());
+	print(true);
 	if (*(config.dead))
 	{
-		pthread_mutex_unlock(print());
+		print(false);
 		return ;
 	}
 	*(config.dead) = true;
 	printf(MSG_BASE, get_time() - philo->start, philo->pid, MSG_DEAD);
-	pthread_mutex_unlock(print());
+	print(false);
 }
 
 int
@@ -107,14 +109,14 @@ enum e_state state
 	else if (state == sleeping)
 		msg = MSG_SLEEP;
 	pthread_mutex_lock(&philo->self);
-	pthread_mutex_lock(print());
+	print(true);
 	ret = stop(philo->chart);
 	if (!ret)
 		printf(MSG_BASE, get_time() - philo->start, philo->pid, msg);
 	philo->state = state;
 	if (state == eating)
 		philo->last_meal = get_time();
-	pthread_mutex_unlock(print());
+	print(false);
 	pthread_mutex_unlock(&philo->self);
 	return (ret);
 }

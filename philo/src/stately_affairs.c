@@ -16,20 +16,30 @@
 #include <stdint.h>
 #include <stdio.h>
 
-t_lock
-	*gate(void)
+void
+	gate(
+int lock
+)
 {
 	static t_lock	gate = PTHREAD_MUTEX_INITIALIZER;
 
-	return (&gate);
+	if (lock)
+		pthread_mutex_lock(&gate);
+	else
+		pthread_mutex_unlock(&gate);
 }
 
-t_lock
-	*print(void)
+void
+	print(
+int lock
+)
 {
 	static t_lock	print = PTHREAD_MUTEX_INITIALIZER;
 
-	return (&print);
+	if (lock)
+		pthread_mutex_lock(&print);
+	else
+		pthread_mutex_unlock(&print);
 }
 
 size_t
@@ -66,16 +76,16 @@ t_philo *const philo
 	pthread_mutex_lock(&philo->self);
 	if (get_time() - philo->last_meal <= philo->chart.die)
 		return (pthread_mutex_unlock(&philo->self), 0);
-	pthread_mutex_lock(print());
+	print(true);
 	if (*(philo->chart.dead))
 	{
-		pthread_mutex_unlock(print());
+		print(false);
 		pthread_mutex_unlock(&philo->self);
 		return (1);
 	}
 	*(philo->chart.dead) = true;
 	printf(MSG_BASE, get_time() - philo->start, philo->pid, MSG_DEAD);
-	pthread_mutex_unlock(print());
+	print(false);
 	pthread_mutex_unlock(&philo->self);
 	return (1);
 }

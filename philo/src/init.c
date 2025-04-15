@@ -127,7 +127,7 @@ pthread_t *monitor
 	unsigned int				i;
 
 	i = -1;
-	pthread_mutex_lock(gate());
+	gate(true);
 	while (++i < config.count)
 	{
 		if (pthread_create(&philo[i].thread, NULL, philosopher, &philo[i]))
@@ -143,6 +143,6 @@ pthread_t *monitor
 		mutex_clean(config.count, philo);
 		return (true);
 	}
-	pthread_mutex_unlock(gate());
+	gate(false);
 	return (false);
 }

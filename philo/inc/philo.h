@@ -66,10 +66,14 @@ struct s_philo
 	unsigned int	count;
 };
 
-t_lock
-	*gate(void);	// FILE: stately_affairs.c
-t_lock
-	*print(void);	// FILE: stately_affairs.c
+void
+	gate(
+		int lock
+		);	// FILE: stately_affairs.c
+void
+	print(
+		int lock
+		);	// FILE: stately_affairs.c
 size_t
 	get_time(void);	// FILE: stately_affairs.c
 int	
